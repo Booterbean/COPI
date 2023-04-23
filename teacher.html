@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="copi.css"/> 
+    <link rel="icon" href="/assets/COPI.png">
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-firestore.js"></script>
+
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayedMath: [['$$', '$$']],
+          processEscapes: true
+        }
+      });
+    </script>
+    <script type="text/javascript">
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+    
+        function renderNewContent() {
+          var content = "This is some new content with math $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$";
+          document.getElementById("content").innerHTML += content;
+    
+          MathJax.Hub.Queue(["Typeset", MathJax.Hub, document.getElementById("content")]);
+        }
+      </script>
+
+    <title>Teacher Dashboard</title>
+</head>
+
+
+
+<body>
+    
+
+
+
+
+
+    <center>
+        <div class="topbar">
+            <img class = "logo" src="COPI.png" alt="Logo">
+            <h3>Teacher Dashboard</h3>
+        </div>
+    </center>
+    
+
+    <div id="homework">
+
+        <div id="problems-teacher">
+            <h3>Assign Problems</h3>
+            <button id="add-problem">+</button>
+            <button id="upload-problems">Upload</button>
+            <div id="problems"></div>
+            <div id="responses"></div>
+        </div>
+
+
+        <div id="messages-teacher">
+            <div id="contents"></div>
+            <textarea id="messageInput" name="paragraph" rows="2" cols="40"></textarea>
+            <button id="commitmsg">Send</button>
+        </div>
+
+        <div id="stats-upload">
+            <form id = "statform">
+              <label for="score">Score:</label>
+              <input type="text" id="score" name="score"><br><br>
+        
+              <label for="creativity-metric">Creativity Metric:</label>
+              <input type="text" id="creativity-metric" name="creativity-metric"><br><br>
+        
+              <label for="calculation-metric">Calculation Metric:</label>
+              <input type="text" id="calculation-metric" name="calculation-metric"><br><br>
+        
+              <label for="p-set-marked-pdf">P-Set Marked PDF:</label>
+              <input type="text" id="markedpdf" name="markedpdf"><br><br>
+        
+              <label for="extra-comments">Extra Comments:</label>
+              <input type="text" id="extra-comments" name="extra-comments"><br><br>
+        
+              <label for="topicn">TopicN:</label>
+              <input type="text" id="topicn" name="topicn"><br><br>
+
+              <label for="topicnp1">TopicNp1:</label>
+              <input type="text" id="topicnp1" name="topicnp1"><br><br>
+        
+              <label for="handout">Handout:</label>
+              <input type="text" id="handout" name="handout"><br><br>
+        
+              <label for="suggested-reading">Suggested Reading:</label>
+              <input type="text" id="sugred" name="sugred"><br><br>
+        
+              <label for="num-problems">Number of Problems to Solve:</label>
+              <input type="text" id="num-problems" name="num-problems"><br><br>
+        
+              <label for="pset-difficulty">Problem Set Difficulty:</label>
+              <input type="text" id="pset-difficulty" name="pset-difficulty"><br><br>
+        
+              <label for="prelim-reading">Preliminary Reading:</label>
+              <input type="text" id="prelim" name="prelim"><br><br>
+        
+              <button id="upload-info">Upload</button>
+            </form>
+          </div>
+
+    </div>
+
+
+    <script src="firebaseinit.js"></script>
+    <script>
+
+
+
+
+        const uploadBtn = document.getElementById('upload-info');
+        uploadBtn.addEventListener('click', function(event) {
+            event.preventDefault(); 
+
+            const form = document.getElementById('statform');
+            const formData = new FormData(form);
+
+            const docRef = db.collection('S1').doc('info');
+            console.log(formData.get('topicn'))
+            docRef.set({
+            score: formData.get('score'),
+            creativityMetric: formData.get('creativity-metric'),
+            calculationMetric: formData.get('calculation-metric'),
+            gradedPDF: formData.get('markedpdf'),
+            extraComments: formData.get('extra-comments'),
+            topicN: formData.get('topicn'),
+            topicNp1: formData.get('topicnp1'),
+            handout: formData.get('handout'),
+            prelimReading: formData.get("prelim"),
+            sugReading: formData.get("sugred"),
+            numProblems: formData.get('num-problems'),
+            psetDifficulty: formData.get('pset-difficulty'),
+            })
+            .then(function() {
+            console.log('Document successfully written!');
+            firebase.firestore().collection("S1").doc("messages").set({});
+            form.reset();
+            })
+            .catch(function(error) {
+            console.error('Error writing document: ', error);
+            });
+        });
+
+
+
+
+        const commitmsg = document.getElementById("commitmsg");
+        const messageInput = document.getElementById("messageInput");
+
+       
+        commitmsg.addEventListener("click", () => {
+       
+        const message = messageInput.value;
+
+    
+        firebase.firestore().collection("S1").doc("messages").update({
+            messages: firebase.firestore.FieldValue.arrayUnion({
+            message: "Corey: " + message,
+            timestamp: new Date()
+            })
+        })
+        .then(() => {
+            console.log("Message appended successfully!");
+         
+            messageInput.value = "";
+        })
+        .catch((error) => {
+            console.error("Error appending message:", error);
+        });
+        });
+
+        var messageDivS1 = document.getElementById("contents");
+
+        
+        db.collection("S1").doc("messages")
+            .onSnapshot(function(doc) {
+               
+            
+                var messages = doc.data().messages;
+                
+          
+                messageDivS1.innerHTML = "";
+                
+            
+                messages.forEach(function(message) {
+
+                    var messageElement = document.createElement("p");
+                    messageElement.innerHTML = message.message;
+                    messageDivS1.appendChild(messageElement);
+
+                    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+                });
+            });
+
+
+
+        const addButton = document.getElementById("add-problem");
+        const problemsContainer = document.getElementById("problems");
+        let problemCount = 0;
+        
+
+        
+
+
+        addButton.addEventListener("click", function() {
+            problemCount++;
+            const newProblem = document.createElement("div");
+            newProblem.id = "problem-" + problemCount;
+            newProblem.classList.add("problem");
+            newProblem.innerHTML = `
+            <button class="delete-problem">delete</button>
+            <form>
+                <label>Name:</label> <input type="text" name="name"><br>
+                <label>Topic:</label> <input type="text" name="topic"><br>
+                <label>Difficulty:</label> <input type="text" name="difficulty"><br>
+                <label>Problem:</label> <textarea name="statement"></textarea>
+            </form>
+            `;
+            problemsContainer.appendChild(newProblem);
+            const deleteButton = newProblem.querySelector(".delete-problem");
+            deleteButton.addEventListener("click", function() {
+                newProblem.remove();
+            });
+        });
+
+        const uploadButton = document.getElementById("upload-problems");
+        uploadButton.addEventListener("click", function() {
+        db.collection("S1").doc("problems").set({})
+        let problem_data = {}
+
+        problemsContainer.querySelectorAll(".problem").forEach(function(problem, i) {
+            problem_data[i] = {
+                name: problem.querySelector('input[name="name"]').value,
+                topic: problem.querySelector('input[name="topic"]').value,
+                difficulty: problem.querySelector('input[name="difficulty"]').value,
+                statement: problem.querySelector('textarea[name="statement"]').value,
+                solution: ""
+            }; 
+        });
+        
+        db.collection("S1").doc("problems").update(problem_data)
+            .then(function(docRef) {
+                console.log("Document written with ID: ", db.collection("S1").doc("problems").id);
+            })
+            .catch(function(error) {
+                console.error("Error adding document: ", error);
+            });
+        });
+
+
+
+
+    const problemsDocRef = db.collection("S1").doc("problems");
+
+    problemsDocRef.get().then((doc) => {
+    if (doc.exists) {
+        const problemsData = doc.data();
+
+
+        
+        
+
+        let problemCount = 0;
+        for (const key in problemsData) {
+            console.log(problemsData);
+            problemCount++;
+            const problem = problemsData[key];
+            const prob = document.createElement("div");
+            prob.id = "problem-" + problemCount;
+            prob.innerHTML = `
+                <div class = problem>
+                    <div class="problemtitle">
+                        <b>Problem: ${problem.name}</b> <br>
+                        <b>Source: ${problem.topic}</b> <br>
+                        <b>Difficulty: ${problem.difficulty}</b>
+                    </div>
+                    <div class = "statement" id="problem-${problemCount}">
+                        ${problem.statement}
+                    </div>
+                    Their Solution:
+                    <div id="textDisplay-${problemCount}">${problem.solution}</div>
+                </div>
+            `;
+
+
+ 
+        document.getElementById("responses").appendChild(prob);
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+        }
+      
+    } else {
+        console.log("No such document or problems field not found!");
+    }
+    }).catch((error) => {
+    console.log("Error getting document:", error);
+    });
+
+
+
+    </script>
+
+<script src="firebaseinit.js"></script>
+
+</body>
+</html>
