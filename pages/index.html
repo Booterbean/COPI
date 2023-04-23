@@ -1,0 +1,128 @@
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CPOT Login</title>
+  <link rel="stylesheet" type="text/css" href="/Styles/index.css" /> 
+  <link rel="icon" href="/assets/COPI.png">
+</head>
+<body>
+
+
+  <center>
+  <div class="top-bar">
+    <img class = "logo" src="/assets/COPI.png" alt="Logo">
+    <p class = title>Welcome to COPI</p>
+  </div>
+
+  <div class="blocks">
+
+    <p class = "about">Corey's Olympaid Preperation Interface (COPI) 
+      is an individualized training program open to talented/motivated high school
+       and middle school students seriously preparring for 
+       mathematical olympiads such as the USA(J)MO. Because of how much
+      work I put into writing, lecture preparration, and grading,
+       there are only 3 training slots that may or may not be open 
+       at a given time. Email coreypredella@gmail.com if you are interested in applying.</p>
+    
+       <div class="loginform">
+        <p>Current Student Login</p>
+        <form id="loginForm" onsubmit="return checkCredentials()">
+            <table>
+                <tr>
+                    <td>Username:</td>
+                    <td><input type="text" id="username" name="username" placeholder="Enter Username Here" required></td>
+                </tr>
+                <tr>
+                    <td>Password:</td>
+                    <td><input type="password" id="password" name="password" placeholder="Enter Password Here" required></td>
+                </tr>
+                <tr>
+                    <td><input type="submit" name="submit" value="Login"></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    
+    <script>
+        function checkCredentials() {
+            var username = document.getElementById("username").value;
+            var password = document.getElementById("password").value;
+            
+            if (username === "student_1" && password === "copipwd1") {
+                document.getElementById("loginForm").action = "student.html";
+                return true;
+
+            } 
+            else if (username === "superuser" && password === "checkmod3"){
+              document.getElementById("loginForm").action = "teacher.html";
+                return true;
+            }
+            
+            else {
+                alert("Incorrect username or password");
+                return false;
+            }
+        }
+    </script>
+    
+
+  </div>
+
+
+  <!-- <div class="apply">
+
+      <div class = howapply>
+        <h3>How to Apply</h3>
+        <p>To become a student of COPI, you must fill out an application. 
+        Applications consist of written solutions to a set of problems that can be found on the right.
+        If you seem like a good fit, I will reach out to you for a brief conversation to ensure you are ready for studying!
+        You do not have to have all of the problems correct to be admitted to a spot; the problems are 
+        just for me to gain a peek into your mathematical thinking ability!</p>
+    </div>
+
+    <div class = "application">
+
+      <div class = "tests">
+        <b><p>Admission Sets for Current Session:</p></b>
+        <a href="">Middle School Admissions Test</a><br>
+        <a href="">High School Admissions Test</a>
+      </div>
+      
+      <form action="" id="loginForm">
+        <br>
+          <table>
+            <tr>
+              <td>Name:</td>
+              <td><input type="text" id="name" name="name" required></td>
+            </tr>
+            <tr>
+              <td>Email:</td>
+              <td><input type="email" id="email" name="email"  required></td>
+            </tr>
+            <tr>
+              <td>Grade:</td>
+              <td><input type="number" id="grade" name="grade"  required></td>
+            </tr>
+            <tr>
+              <td>Upload Solutions:</td>
+              <td><input type="file" id="sols" name="sols"></td>
+            </tr>
+            <tr>
+              <td><input type="submit" name="submit" value="Submit"></td>
+            </tr>
+          </table>
+        </form>
+  </div>
+
+  </div> -->
+    
+  </div>
+  
+ 
+  
+  </center>
+</body>
+</html>
