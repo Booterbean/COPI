@@ -151,29 +151,33 @@ textarea {
 }
 
 #responses{
-    width:500px;
+    padding: 10px;
+    border-radius: 20px;
+    margin: 10px auto; /* Center problems inside the parent container */
+    box-sizing: border-box; /* Include padding and border in the element's width */
+    width: 100%; /* Make sure it doesn't overflow */
 }
 
 #problems-teacher{
-    background-color: #cbcefa;
-    color: rgb(0, 0, 0);
-    padding: 10px;
-    width:500px;
-    border-radius: 20px;
-    margin-top: 20px;
     border: 2px solid #b0b5ff;
-    font-size: 30;
+    background-color: #cbcefa;
+    padding: 10px;
+    border-radius: 20px;
+    width: 80%; /* Set width to 80% of the viewport */
+    margin: 20px auto; /* Center it horizontally with automatic margins */
+    box-sizing: border-box; /* Include padding and border in the element's width */
 }
 
 #stats-upload{
     background-color: #cbcefa;
     color: rgb(0, 0, 0);
-    padding: 10px;
-    width:400px;
     border-radius: 20px;
-    margin-top: 20px;
     border: 2px solid #b0b5ff;
     font-size: 30;
+    padding: 10px;
+    margin: 10px auto; /* Center problems inside the parent container */
+    box-sizing: border-box; /* Include padding and border in the element's width */
+    width: 80%; /* Make sure it doesn't overflow */
     
 }
 
