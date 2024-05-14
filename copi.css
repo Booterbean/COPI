@@ -115,7 +115,12 @@ textarea {
     font-family: 'Lato', sans-serif; /* Maintain font consistency */
 }
 
-
+#collectionSelector {
+    padding: 5px;
+    margin-right: 20px; /* Adjust according to your layout */
+    font-size: 16px;
+    cursor: pointer;
+}
 
 
 [id*="textDisplay"] {

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/assets/COPI.png">
+    <link rel="stylesheet" type="text/css" href="copi.css"/> 
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-firestore.js"></script>
+
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        displayedMath: [['$$', '$$']],
+        processEscapes: true
+        }
+    });
+    </script>
+    <script type="text/javascript">
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+
+        function renderNewContent() {
+        var content = "This is some new content with math $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$";
+        document.getElementById("content").innerHTML += content;
+
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, document.getElementById("content")]);
+        }
+    </script>
+
+    <title>Student Dashboard</title>
+</head>
+
+<body>
+    
+
+    <center>
+        <div class="topbar">
+            <img class="logo" src="COPI.png" alt="Logo">
+            <h3>Student Dashboard</h3>
+        </div>
+    </center>
+
+
+
+    <div class="Overview">
+
+        <div id="grading">
+            <h3>Week $(n-1)$ Grading</h3>
+        </div>
+
+        <div id="thisweek">
+            <h2>This Week</h2>
+        </div>
+
+        <div id="nextweek">
+            <h2>Week $(n+1)$</h2>
+        </div>
+
+        <div class="resources">
+            <h2>Resources</h2>
+            <b><p>LaTeX Docs: <a href="https://www.overleaf.com/learn" target="_blank">Click Here</a>  <br>
+            AOPS Wiki: <a href="https://artofproblemsolving.com/wiki/index.php?title=Main_Page" target="_blank">Click Here</a> <br>
+            Study Beats: <a href="https://www.youtube.com/watch?v=jfKfPfyJRdk" target="_blank">Click Here</a> </p> </b>
+            
+        </div>
+    </div>
+
+
+
+    <div id="homework">
+        <div id="problems-student">
+            <h2>Problem Board</h2>
+        </div>
+        <div id="messages-student">
+            <h2>Message Board</h2>
+            <div id="contents"></div>
+            <textarea id="messageInput" name="paragraph" rows="2" cols="40"></textarea>
+            <button id="commitmsg">Send</button>
+        </div>
+    </div>
+
+
+
+
+
+    <script src="firebaseinit.js"></script>
+    <script>
+
+
+
+        const docRef = db.collection('S1').doc('info');
+        docRef.get().then(function(doc) {
+            if (doc.exists) {
+                
+
+                const data = doc.data();
+
+                console.log(data)
+                var stat;
+
+                const lastWeek = document.getElementById('grading');
+                const thisWeek = document.getElementById('thisweek');
+                const nextWeek = document.getElementById('nextweek');
+
+                stat = document.createElement('p');
+                stat.textContent = `Score: ${data.score}`;
+                lastWeek.appendChild(stat);
+
+                stat = document.createElement('p');
+                stat.textContent += `Correctness/Calculation: ${data.creativityMetric}`;
+                lastWeek.appendChild(stat);
+
+                stat = document.createElement('p');
+                stat.textContent = `Rigor/Creativity: ${data.calculationMetric}`;
+                lastWeek.appendChild(stat);
+
+                stat = document.createElement('p');
+                stat.textContent = `Graded PDF: ${data.gradedPDF}`;
+                lastWeek.appendChild(stat);
+
+                stat = document.createElement('p');
+                stat.textContent = `Extra Comments: ${data.extraComments}`;
+                lastWeek.appendChild(stat);
+
+
+
+                stat = document.createElement('p');
+                stat.textContent = `Topic: ${data.topicN}`;
+                thisWeek.appendChild(stat);
+
+                stat = document.createElement('p');
+                stat.textContent = `Handout: ${data.handout}`;
+                thisWeek.appendChild(stat);
+
+                stat = document.createElement('p');
+                stat.textContent = `Suggested Reading: ${data.sugReading}`;
+                thisWeek.appendChild(stat);
+
+                stat = document.createElement('p');
+                stat.textContent = `Number of Problems: ${data.numProblems}`;
+                thisWeek.appendChild(stat);
+
+                stat = document.createElement('p');
+                stat.textContent = `Subject Difficulty: ${data.psetDifficulty}`;
+                thisWeek.appendChild(stat);
+
+                stat = document.createElement('p');
+                stat.textContent = `Topic: ${data.topicNp1}`;
+                nextWeek.appendChild(stat);
+
+                stat = document.createElement('p');
+                stat.textContent = `Preliminary Reading: ${data.prelimReading}`;
+                nextWeek.appendChild(stat);
+
+
+            } else {
+                console.log('No such document!');
+            }
+        }).catch(function(error) {
+            console.log('Error getting document:', error);
+        });
+
+
+
+
+
+
+
+        const commitmsg = document.getElementById("commitmsg");
+        const messageInput = document.getElementById("messageInput");
+
+        commitmsg.addEventListener("click", () => {
+        const message = messageInput.value;
+
+        firebase.firestore().collection("S1").doc("messages").update({
+            messages: firebase.firestore.FieldValue.arrayUnion({
+            message: "Student " + "(" + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" }) + "): " + message,
+            timestamp: new Date()
+            })
+        })
+        .then(() => {
+            console.log("Message appended successfully!");
+            messageInput.value = "";
+        })
+        .catch((error) => {
+            console.error("Error appending message:", error);
+        });
+        });
+
+        var messageDivS1 = document.getElementById("contents");
+
+        db.collection("S1").doc("messages")
+            .onSnapshot(function(doc) {
+            
+                var messages = doc.data().messages;
+                
+                messageDivS1.innerHTML = "";
+                
+                messages.forEach(function(message) {
+
+                    var messageElement = document.createElement("p");
+                    messageElement.innerHTML = message.message;
+                    messageDivS1.appendChild(messageElement);
+                    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+                });
+            });
+
+
+
+
+        const problemsDocRef = db.collection("S1").doc("problems");
+
+        problemsDocRef.get().then((doc) => {
+        if (doc.exists) {
+            const problemsData = doc.data();
+
+            let problemCount = 0;
+            for (const key in problemsData) {
+            problemCount++;
+            const problem = problemsData[key];
+            const prob = document.createElement("div");
+            prob.id = "problem-" + problemCount;
+            
+            prob.innerHTML = `
+                <div class = problem>
+                    <div class="problemtitle">
+                        <b>Problem: ${problem.name}</b> <br>
+                        <b>Source: ${problem.topic}</b> <br>
+                        <b>Difficulty: ${problem.difficulty}</b>
+                    </div>
+                    <div class = "statement" id="problem-${problemCount}">
+                        ${problem.statement}
+                    </div>
+                    Type your response here:
+                    <form class ="solutionBox">
+                        <textarea id="solparagraph-${problemCount}" name="paragraph" rows="2" cols="60">${problem.solution}</textarea>
+                        <br>
+                    </form>
+                    <button type="submit" class="subprob">Submit</button> <br> <br>
+                    Your Solution:
+                    <div id="textDisplay-${problemCount}"></div>
+                </div>
+            `;
+
+
+            
+            document.getElementById("problems-student").appendChild(prob);
+          
+            }
+
+
+            const textareas = document.getElementById("problems-student").querySelectorAll("[id*='solparagraph']");
+            const textDisplays = document.getElementById("problems-student").querySelectorAll("[id*='textDisplay']");
+
+
+
+            for (let i = 0; i < textareas.length; i++) {
+            const textarea = textareas[i];
+            const textDisplay = textDisplays[i];
+
+            const inputText = textarea.value;
+            const pattern = /\$\$([^$]+)\$\$|\$([^\$]+)\$/g;
+            let outputText = inputText.replace(pattern, (match, p1, p2) => {
+                if (p1) {
+                return '\\[ ' + p1 + ' \\]';
+                } else if (p2) {
+                return '\\( ' + p2 + ' \\)';
+                }
+            });
+            textDisplay.innerHTML = outputText;
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+            }
+
+
+            
+            for (let i = 0; i < textareas.length; i++) {
+            const textarea = textareas[i];
+            const textDisplay = textDisplays[i];
+            
+            textarea.addEventListener('input', (() => {
+                return () => {
+                const inputText = textarea.value;
+                const pattern = /\$\$([^$]+)\$\$|\$([^\$]+)\$/g;
+                let outputText = inputText.replace(pattern, (match, p1, p2) => {
+                    if (p1) {
+                    return '\\[ ' + p1 + ' \\]';
+                    } else if (p2) {
+                    return '\\( ' + p2 + ' \\)';
+                    }
+                });
+                textDisplay.innerHTML = outputText;
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+                };
+            })());
+            }
+
+
+
+        const sols = document.getElementById("problems-student").querySelectorAll("[id*='solparagraph']");
+        const subs = document.getElementById("problems-student").querySelectorAll("[class*='subprob']");
+
+        for (let i = 0; i < subs.length; i++) {
+            const subbtn = subs[i];
+
+            subbtn.addEventListener('click', () => {
+                
+                for (const key in problemsData) {
+                   
+                    problemsData[key].solution = sols[key].value
+                }
+
+                db.collection("S1").doc("problems").update(problemsData)
+                        .then(function(docRef) {
+                            console.log("Document written with ID: ", db.collection("S1").doc("problems").id);
+                        })
+                        .catch(function(error) {
+                            console.error("Error adding document: ", error);
+                        });
+            });
+
+
+
+
+
+
+
+        }
+
+
+        } else {
+            console.log("No such document or problems field not found!");
+        }
+        }).catch((error) => {
+        console.log("Error getting document:", error);
+        });
+
+
+        
+        
+
+    </script>
+    
+</body>
+</html>

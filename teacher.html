@@ -37,6 +37,12 @@
       </script>
 
     <title>Teacher Dashboard</title>
+    <select id="collectionSelector" style="position: fixed; top: 10px; right: 10px;">
+        <option value="S1">S1</option>
+        <option value="S2">S2</option>
+        <option value="S3">S3</option>
+        <!-- Add more options as needed -->
+    </select>
 </head>
 
 
@@ -120,200 +126,181 @@
 
     <script src="firebaseinit.js"></script>
     <script>
-
-
-
-
-        const uploadBtn = document.getElementById('upload-info');
-        uploadBtn.addEventListener('click', function(event) {
+        // Global scope variable to hold the current collection name
+        let collectionName = 'S1';  // Default collection name
+        updateMessages(); 
+        updateProblems();
+    
+        // Dropdown selection listener for changing collections
+        document.getElementById("collectionSelector").addEventListener("change", function() {
+            collectionName = this.value;  // Update the collection name based on selection
+            updateMessages();  // Refresh messages from the new collection
+            updateProblems();  // Refresh problems from the new collection
+        });
+    
+        // Function to update messages when the collection changes
+        function updateMessages() {
+            const messagesDiv = document.getElementById("contents");
+            db.collection(collectionName).doc("messages").onSnapshot(function(doc) {
+                messagesDiv.innerHTML = "";  // Clear existing messages
+                if (doc.exists && doc.data().messages) {
+                    doc.data().messages.forEach(function(message) {
+                        var messageElement = document.createElement("p");
+                        messageElement.innerHTML = message.message;
+                        messagesDiv.appendChild(messageElement);
+                    });
+                    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+                }
+            });
+        }
+    
+        // Function to update problems when the collection changes
+        function updateProblems() {
+            const problemsContainer = document.getElementById("problems");
+            db.collection(collectionName).doc("problems").get().then(function(doc) {
+                problemsContainer.innerHTML = "";  // Clear existing problems
+                if (doc.exists) {
+                    const problemsData = doc.data();
+                    Object.keys(problemsData).forEach(function(key) {
+                        const problem = problemsData[key];
+                        const problemElement = document.createElement("div");
+                        problemElement.className = "problem";
+                        problemElement.innerHTML = `
+                            <div class="problemtitle">
+                                <b>Problem: ${problem.name}</b><br>
+                                <b>Source: ${problem.topic}</b><br>
+                                <b>Difficulty: ${problem.difficulty}</b>
+                            </div>
+                            <div class="statement">
+                                ${problem.statement}
+                            </div>
+                            Their Solution:
+                            <div id="textDisplay">${problem.solution || 'No solution provided'}</div>
+                        `;
+                        problemsContainer.appendChild(problemElement);
+                        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+                    });
+                } else {
+                    console.log("No such document or problems field found!");
+                }
+            }).catch(function(error) {
+                console.error("Error fetching problems:", error);
+            });
+        }
+    
+        // Listen to form submission for updating information
+        document.getElementById('upload-info').addEventListener('click', function(event) {
             event.preventDefault(); 
-
             const form = document.getElementById('statform');
             const formData = new FormData(form);
-
-            const docRef = db.collection('S1').doc('info');
-            console.log(formData.get('topicn'))
-            docRef.set({
-            score: formData.get('score'),
-            creativityMetric: formData.get('creativity-metric'),
-            calculationMetric: formData.get('calculation-metric'),
-            gradedPDF: formData.get('markedpdf'),
-            extraComments: formData.get('extra-comments'),
-            topicN: formData.get('topicn'),
-            topicNp1: formData.get('topicnp1'),
-            handout: formData.get('handout'),
-            prelimReading: formData.get("prelim"),
-            sugReading: formData.get("sugred"),
-            numProblems: formData.get('num-problems'),
-            psetDifficulty: formData.get('pset-difficulty'),
-            })
-            .then(function() {
-            console.log('Document successfully written!');
-            firebase.firestore().collection("S1").doc("messages").set({});
-            form.reset();
-            })
-            .catch(function(error) {
-            console.error('Error writing document: ', error);
+            const docRef = db.collection(collectionName).doc('info');
+            const infoData = {
+                score: formData.get('score'),
+                creativityMetric: formData.get('creativity-metric'),
+                calculationMetric: formData.get('calculation-metric'),
+                gradedPDF: formData.get('markedpdf'),
+                extraComments: formData.get('extra-comments'),
+                topicN: formData.get('topicn'),
+                topicNp1: formData.get('topicnp1'),
+                handout: formData.get('handout'),
+                prelimReading: formData.get("prelim"),
+                sugReading: formData.get("sugred"),
+                numProblems: formData.get('num-problems'),
+                psetDifficulty: formData.get('pset-difficulty'),
+            };
+            docRef.set(infoData).then(function() {
+                console.log('Document successfully written!');
+                firebase.firestore().collection(collectionName).doc("messages").set({});
+                form.reset();
+            }).catch(function(error) {
+                console.error('Error writing document: ', error);
             });
         });
-
-
-
-
-        const commitmsg = document.getElementById("commitmsg");
-        const messageInput = document.getElementById("messageInput");
-
-       
-        commitmsg.addEventListener("click", () => {
-       
-        const message = messageInput.value;
-
     
-        firebase.firestore().collection("S1").doc("messages").update({
-            messages: firebase.firestore.FieldValue.arrayUnion({
-            message: "Corey: " + message,
-            timestamp: new Date()
-            })
-        })
-        .then(() => {
-            console.log("Message appended successfully!");
-         
-            messageInput.value = "";
-        })
-        .catch((error) => {
-            console.error("Error appending message:", error);
-        });
-        });
-
-        var messageDivS1 = document.getElementById("contents");
-
-        
-        db.collection("S1").doc("messages")
-            .onSnapshot(function(doc) {
-               
-            
-                var messages = doc.data().messages;
-                
-          
-                messageDivS1.innerHTML = "";
-                
-            
-                messages.forEach(function(message) {
-
-                    var messageElement = document.createElement("p");
-                    messageElement.innerHTML = message.message;
-                    messageDivS1.appendChild(messageElement);
-
-                    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-                });
+        // Listener for message submission
+        document.getElementById("commitmsg").addEventListener("click", () => {
+            const messageInput = document.getElementById("messageInput");
+            const message = messageInput.value;
+            db.collection(collectionName).doc("messages").update({
+                messages: firebase.firestore.FieldValue.arrayUnion({
+                    message: "Corey: " + message,
+                    timestamp: new Date()
+                })
+            }).then(() => {
+                console.log("Message appended successfully!");
+                messageInput.value = "";
+            }).catch((error) => {
+                console.error("Error appending message:", error);
             });
-
-
-
+        });
+    
+        // Adding and deleting problems dynamically
         const addButton = document.getElementById("add-problem");
-        const problemsContainer = document.getElementById("problems");
-        let problemCount = 0;
-        
-
-        
-
-
         addButton.addEventListener("click", function() {
-            problemCount++;
+            let problemCount = document.querySelectorAll('.problem').length;
             const newProblem = document.createElement("div");
             newProblem.id = "problem-" + problemCount;
             newProblem.classList.add("problem");
             newProblem.innerHTML = `
-            <button class="delete-problem">delete</button>
-            <form>
-                <label>Name:</label> <input type="text" name="name"><br>
-                <label>Topic:</label> <input type="text" name="topic"><br>
-                <label>Difficulty:</label> <input type="text" name="difficulty"><br>
-                <label>Problem:</label> <textarea name="statement"></textarea>
-            </form>
+                <button class="delete-problem">Delete</button>
+                <form>
+                    <label>Name:</label> <input type="text" name="name"><br>
+                    <label>Topic:</label> <input type="text" name="topic"><br>
+                    <label>Difficulty:</label> <input type="text" name="difficulty"><br>
+                    <label>Problem:</label> <textarea name="statement"></textarea>
+                </form>
             `;
+            const problemsContainer = document.getElementById("problems");
             problemsContainer.appendChild(newProblem);
             const deleteButton = newProblem.querySelector(".delete-problem");
             deleteButton.addEventListener("click", function() {
                 newProblem.remove();
             });
         });
-
+    
+        // Submit all problems to Firestore
         const uploadButton = document.getElementById("upload-problems");
         uploadButton.addEventListener("click", function() {
-        db.collection("S1").doc("problems").set({})
-        let problem_data = {}
+            const problemsContainer = document.getElementById("problems");
+            db.collection(collectionName).doc("problems").set({})
+            let problem_data = {};
 
-        problemsContainer.querySelectorAll(".problem").forEach(function(problem, i) {
-            problem_data[i] = {
-                name: problem.querySelector('input[name="name"]').value,
-                topic: problem.querySelector('input[name="topic"]').value,
-                difficulty: problem.querySelector('input[name="difficulty"]').value,
-                statement: problem.querySelector('textarea[name="statement"]').value,
-                solution: ""
-            }; 
-        });
-        
-        db.collection("S1").doc("problems").update(problem_data)
-            .then(function(docRef) {
-                console.log("Document written with ID: ", db.collection("S1").doc("problems").id);
-            })
-            .catch(function(error) {
-                console.error("Error adding document: ", error);
+            // Collecting problem data from all problem forms created
+            const allProblems = problemsContainer.querySelectorAll('[id^="problem-"]');
+
+            console.log(allProblems);
+            allProblems.forEach((problem, index) => {
+                // Assuming each problem has inputs and a textarea for its data
+                let name = problem.querySelector('input[name="name"]').value;
+                let topic = problem.querySelector('input[name="topic"]').value;
+                let difficulty = problem.querySelector('input[name="difficulty"]').value;
+                let statement = problem.querySelector('textarea[name="statement"]').value;
+
+                problem_data[index] = {
+                    name: name,
+                    topic: topic,
+                    difficulty: difficulty,
+                    statement: statement,
+                    solution: "" // Defaulting solution to an empty string if not provided
+                };
             });
+
+            // Check if there is at least one problem to upload
+            if (Object.keys(problem_data).length > 0) {
+                // Setting the document with the new problems data
+                db.collection(collectionName).doc("problems").set(problem_data)
+                .then(() => {
+                    console.log("Problems uploaded successfully.");
+                }).catch((error) => {
+                    console.error("Error uploading problems:", error);
+                });
+            } else {
+                console.log("No problems to upload.");
+            }
         });
-
-
-
-
-    const problemsDocRef = db.collection("S1").doc("problems");
-
-    problemsDocRef.get().then((doc) => {
-    if (doc.exists) {
-        const problemsData = doc.data();
-
-
-        
-        
-
-        let problemCount = 0;
-        for (const key in problemsData) {
-            console.log(problemsData);
-            problemCount++;
-            const problem = problemsData[key];
-            const prob = document.createElement("div");
-            prob.id = "problem-" + problemCount;
-            prob.innerHTML = `
-                <div class = problem>
-                    <div class="problemtitle">
-                        <b>Problem: ${problem.name}</b> <br>
-                        <b>Source: ${problem.topic}</b> <br>
-                        <b>Difficulty: ${problem.difficulty}</b>
-                    </div>
-                    <div class = "statement" id="problem-${problemCount}">
-                        ${problem.statement}
-                    </div>
-                    Their Solution:
-                    <div id="textDisplay-${problemCount}">${problem.solution}</div>
-                </div>
-            `;
-
-
- 
-        document.getElementById("responses").appendChild(prob);
-        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-        }
-      
-    } else {
-        console.log("No such document or problems field not found!");
-    }
-    }).catch((error) => {
-    console.log("Error getting document:", error);
-    });
-
-
-
     </script>
+
+    
 
 <script src="firebaseinit.js"></script>
 

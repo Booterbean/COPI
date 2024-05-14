@@ -46,9 +46,16 @@
             var password = document.getElementById("password").value;
             
             if (username === "student_1" && password === "copipwd1") {
-                document.getElementById("loginForm").action = "student.html";
+                document.getElementById("loginForm").action = "student1.html";
                 return true;
-
+            } 
+            else if (username === "student_2" && password === "copipwd2") {
+                document.getElementById("loginForm").action = "student2.html";
+                return true;
+            } 
+            else if (username === "student_2" && password === "copipwd2") {
+                document.getElementById("loginForm").action = "student3.html";
+                return true;
             } 
             else if (username === "superuser" && password === "checkmod3"){
               document.getElementById("loginForm").action = "teacher.html";
