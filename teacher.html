@@ -212,6 +212,8 @@
                 console.log('Document successfully written!');
                 firebase.firestore().collection(collectionName).doc("messages").set({});
                 form.reset();
+                updateMessages(); 
+                updateProblems();
             }).catch(function(error) {
                 console.error('Error writing document: ', error);
             });
@@ -229,6 +231,7 @@
             }).then(() => {
                 console.log("Message appended successfully!");
                 messageInput.value = "";
+                updateMessages(); 
             }).catch((error) => {
                 console.error("Error appending message:", error);
             });
@@ -268,7 +271,6 @@
             // Collecting problem data from all problem forms created
             const allProblems = problemsContainer.querySelectorAll('[id^="problem-"]');
 
-            console.log(allProblems);
             allProblems.forEach((problem, index) => {
                 // Assuming each problem has inputs and a textarea for its data
                 let name = problem.querySelector('input[name="name"]').value;
@@ -284,7 +286,8 @@
                     solution: "" // Defaulting solution to an empty string if not provided
                 };
             });
-
+            updateMessages(); 
+            updateProblems();
             // Check if there is at least one problem to upload
             if (Object.keys(problem_data).length > 0) {
                 // Setting the document with the new problems data
