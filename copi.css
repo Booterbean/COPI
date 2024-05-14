@@ -6,8 +6,12 @@
 body {
     background-color: #fcbdd2;
     font-family: 'Lato', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    padding: 0;
 }
-
 .topbar {
     background-color: #cbcefa;
     color: rgb(0, 0, 0);
@@ -15,14 +19,13 @@ body {
     justify-content: center;
     align-items: center;
     height: 100px;
-    width: 800px;
+    width: 80%; /* Set the width to 80% of the viewport width */
     padding: 0px;
     text-align: center;
     margin-top: 50px;
-    font-size: 20px;
+    font-size: 30px; /* Corrected syntax from 'font-size: 30;' */
     border: 8px solid #b0b5ff;
     border-radius: 20px;
-    font-size: 30;
 }
 
 .logo {
@@ -36,9 +39,11 @@ body {
 
 #homework {
     display: flex;
+    flex-direction: column; /* Changed to column for vertical stacking */
     justify-content: center;
     align-items: center;
-
+    width: 80%; /* Set width to 80% of the viewport */
+    margin: 20px 0; /* Added margin for spacing */
 }
 
 
@@ -47,14 +52,13 @@ button {
     font-size: 1.2em;
     padding: 10px;
     margin: 10px;
-    border-radius: 10px;
+    border-radius: 15px;
     background-color: #ffb8a6;
     border: 1px solid #ff6237;
     color: #000000;
     cursor: pointer;
-    border-radius: 15px;
-  box-shadow: 0 4px #e45e39;
-  }
+    box-shadow: 0 4px #e45e39;
+}
 
 button:hover {background-color: #5cff37}
 
@@ -64,19 +68,24 @@ button:active {
     transform: translateY(4px);
   }
 
-#problems-student{
+  #problems-student {
     border: 2px solid #b0b5ff;
     background-color: #cbcefa;
     padding: 10px;
     border-radius: 20px;
+    width: 80%; /* Set width to 80% of the viewport */
+    margin: 20px auto; /* Center it horizontally with automatic margins */
+    box-sizing: border-box; /* Include padding and border in the element's width */
 }
 
-.problem{
+.problem {
     border: 2px solid #fac461;
     background-color: #fddfa7;
     padding: 10px;
     border-radius: 20px;
-    margin: 10px;
+    margin: 10px auto; /* Center problems inside the parent container */
+    box-sizing: border-box; /* Include padding and border in the element's width */
+    width: 100%; /* Make sure it doesn't overflow */
 }
 
 .statement {
@@ -85,24 +94,28 @@ button:active {
     margin: 10px;
     border-radius: 10px;
     padding: 10px;
+    box-sizing: border-box; /* Include padding and border in the element's width */
+    width: 98%; /* Ensure full width but contained within parent element */
 }
 
 .solutionBox {
     display: flex;
-
+    width: 100%; /* Ensure the flex container spans the full width of its parent */
+    box-sizing: border-box; /* Include padding and border in the element's width */
 }
 
 textarea {
-    font-size: 14px;
-    color: #333;
-    background-color: #ffb8a6;
-    border: 1px solid #ff6237;
+    width: 100%; /* Adjust textarea to fill its container */
+    box-sizing: border-box; /* Include padding and border in the textarea's width */
+    background-color: #e6e6fa; /* Example: A light lavender color */
+    color: #333; /* Text color */
+    border: 1px solid #ccc; /* Light gray border */
     padding: 10px;
-    margin: 10px;
-    resize: vertical;
-    font-family: 'Lato';
-    src: url('/Fonts/cmu.serif-roman.ttf') format('truetype');
-  }
+    resize: vertical; /* Allow only vertical resizing */
+    font-family: 'Lato', sans-serif; /* Maintain font consistency */
+}
+
+
 
 
 [id*="textDisplay"] {
@@ -115,16 +128,17 @@ textarea {
   }
 
 
-[id*="messages-"]{
- 
+  [id*="messages-"] {
     height: 550px;
-    width: 400px;
+    width: 80%; /* Match the width as set for problems-student */
     border: 2px solid #b0b5ff;
     background-color: #cbcefa;
     padding: 10px;
-    margin: 10px;
+    margin: 20px auto; /* Adjust margin to center it and provide uniform spacing */
     border-radius: 25px;
-  }
+    box-sizing: border-box; /* Include padding and border in the width calculation */
+}
+
 
 #contents{
     overflow-y: scroll;
